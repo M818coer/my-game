@@ -2,31 +2,28 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>10s Jump Game</title>
+<title>Jump Game</title>
 
 <style>
   canvas {
     background: #f0f0f0;
     display: block;
     margin: 50px auto;
-    touch-action: none;
-  }
-
-  body {
-    text-align: center;
-    font-family: Arial;
-  }
-
-  #restartBtn {
-    display: none;
-    padding: 10px 20px;
-    font-size: 16px;
   }
 
   #winImg {
     display: none;
     width: 200px;
-    margin-top: 20px;
+    margin: 20px auto;
+  }
+
+  #restartBtn {
+    display: none;
+    padding: 10px 20px;
+  }
+
+  body {
+    text-align: center;
   }
 </style>
 </head>
@@ -35,25 +32,23 @@
 
 <canvas id="game" width="500" height="200"></canvas>
 
-<button id="restartBtn">Replay 🔁</button>
+<button id="restartBtn">重新开始</button>
 
-<img id="winImg" src="WhatsApp Image 2026 04 24 at 16.43.14.jpeg">
+<!-- ⚠️ 关键：你的真实图片名（已处理空格） -->
+<img id="winImg" src="WhatsApp%20Image%202026%2004%2024%20at%2016.43.14.jpeg">
 
 <script>
 let canvas = document.getElementById("game");
 let ctx = canvas.getContext("2d");
 
 let btn = document.getElementById("restartBtn");
-let winImg = document.getElementById("winImg");
+let img = document.getElementById("winImg");
 
 let player, obstacles;
 let gameOver = false;
 let win = false;
 let startTime;
 
-let gravity = 0.8;
-
-// ✅ 初始化
 function init() {
   player = { x: 50, y: 150, size: 20, vy: 0, jumping: false };
   obstacles = [];
@@ -62,12 +57,14 @@ function init() {
   startTime = Date.now();
 
   btn.style.display = "none";
-  winImg.style.display = "none";
+  img.style.display = "none";
 }
 
 init();
 
-// ✅ 跳跃
+let gravity = 0.8;
+
+// 跳
 function jump() {
   if (!player.jumping && !gameOver && !win) {
     player.vy = -12;
@@ -75,43 +72,36 @@ function jump() {
   }
 }
 
-// 电脑
 document.addEventListener("keydown", e => {
   if (e.code === "Space") jump();
 });
 
-// 手机
 document.addEventListener("touchstart", jump);
 
-// 重新开始
+// 重开
 btn.onclick = () => {
   init();
   update();
 };
 
-// 生成障碍
+// 障碍
 setInterval(() => {
   if (!gameOver && !win) {
-    obstacles.push({
-      x: 500,
-      y: 160,
-      w: 20,
-      h: 20
-    });
+    obstacles.push({ x: 500, y: 160, w: 20, h: 20 });
   }
 }, 1000);
 
-// 🎮 游戏循环
+// 游戏循环
 function update() {
   ctx.clearRect(0, 0, 500, 200);
 
-  let time = (Date.now() - startTime) / 1000;
+  let t = (Date.now() - startTime) / 1000;
 
   // 地面
   ctx.fillStyle = "black";
   ctx.fillRect(0, 180, 500, 5);
 
-  // 玩家物理
+  // 玩家
   player.y += player.vy;
   player.vy += gravity;
 
@@ -120,7 +110,6 @@ function update() {
     player.jumping = false;
   }
 
-  // 玩家
   ctx.fillStyle = "blue";
   ctx.fillRect(player.x, player.y, player.size, player.size);
 
@@ -130,7 +119,6 @@ function update() {
     o.x -= 5;
     ctx.fillRect(o.x, o.y, o.w, o.h);
 
-    // 碰撞
     if (
       player.x < o.x + o.w &&
       player.x + player.size > o.x &&
@@ -141,19 +129,20 @@ function update() {
     }
   });
 
-  // 🎯 胜利条件：10秒
-  if (time >= 10 && !gameOver) {
+  // 胜利
+  if (t >= 10 && !gameOver) {
     win = true;
   }
 
-  // 结束画面
   if (gameOver || win) {
     ctx.fillStyle = "black";
     ctx.font = "28px Arial";
 
     if (win) {
       ctx.fillText("YOU WIN 🎉", 160, 100);
-      winImg.style.display = "block";
+
+      // 显示你的照片
+      img.style.display = "block";
     } else {
       ctx.fillText("GAME OVER", 150, 100);
       btn.style.display = "block";
