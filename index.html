@@ -2,13 +2,14 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>10s Jump Game</title>
+<title>Jump Game</title>
 
 <style>
   canvas {
     background: #f0f0f0;
     display: block;
     margin: 50px auto;
+    touch-action: none; /* 🔥 防止手机滚动干扰 */
   }
 
   #restartBtn {
@@ -16,13 +17,11 @@
     margin: 10px auto;
     padding: 10px 20px;
     font-size: 16px;
-    cursor: pointer;
   }
 
-  #winImg {
-    display: none;
-    width: 200px;
-    margin: 20px auto;
+  body {
+    text-align: center;
+    font-family: Arial;
   }
 </style>
 </head>
@@ -30,17 +29,12 @@
 <body>
 
 <canvas id="game" width="500" height="200"></canvas>
-
 <button id="restartBtn">Replay 🔁</button>
-
-<img id="winImg" src="WhatsApp Image 2026-04-24 at 16.43.14.jpeg">
 
 <script>
 let canvas = document.getElementById("game");
 let ctx = canvas.getContext("2d");
-
 let btn = document.getElementById("restartBtn");
-let winImg = document.getElementById("winImg");
 
 let player, obstacles;
 let gameOver = false;
@@ -56,22 +50,27 @@ function init() {
   gameOver = false;
   win = false;
   startTime = Date.now();
-
   btn.style.display = "none";
-  winImg.style.display = "none";
 }
-
 init();
 
-// 跳跃
-document.addEventListener("keydown", e => {
-  if (e.code === "Space" && !player.jumping && !gameOver && !win) {
+// 🎮 跳跃函数（统一控制）
+function jump() {
+  if (!player.jumping && !gameOver && !win) {
     player.vy = -12;
     player.jumping = true;
   }
+}
+
+// 💻 电脑跳
+document.addEventListener("keydown", e => {
+  if (e.code === "Space") jump();
 });
 
-// 重新开始按钮
+// 📱 手机跳
+document.addEventListener("touchstart", jump);
+
+// 重新开始
 btn.onclick = () => {
   init();
   update();
@@ -99,7 +98,7 @@ function update() {
   ctx.fillStyle = "black";
   ctx.fillRect(0, 180, 500, 5);
 
-  // 玩家
+  // 玩家物理
   player.y += player.vy;
   player.vy += gravity;
 
@@ -108,6 +107,7 @@ function update() {
     player.jumping = false;
   }
 
+  // 玩家
   ctx.fillStyle = "blue";
   ctx.fillRect(player.x, player.y, player.size, player.size);
 
@@ -133,19 +133,18 @@ function update() {
     win = true;
   }
 
-  // 结束逻辑
+  // 结束
   if (gameOver || win) {
     ctx.fillStyle = "black";
     ctx.font = "28px Arial";
 
     if (win) {
       ctx.fillText("YOU WIN 🎉", 160, 100);
-      winImg.style.display = "block"; // 显示图片
     } else {
       ctx.fillText("GAME OVER", 150, 100);
-      btn.style.display = "block"; // 显示按钮
     }
 
+    btn.style.display = "block";
     return;
   }
 
